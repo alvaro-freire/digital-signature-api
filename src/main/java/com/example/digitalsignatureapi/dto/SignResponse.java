@@ -7,4 +7,8 @@ import lombok.Setter;
 @Getter
 public class SignResponse {
     private String signature;
+
+    public SignResponse(String signature) {
+        this.signature = signature;
+    }
 }

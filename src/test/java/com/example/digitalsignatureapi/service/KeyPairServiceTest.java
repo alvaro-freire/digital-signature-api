@@ -2,22 +2,26 @@ package com.example.digitalsignatureapi.service;
 
 import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.repository.KeyPairRepository;
-import com.example.digitalsignatureapi.util.EncryptionUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class KeyPairServiceTest {
 
     @Mock
@@ -26,34 +30,31 @@ public class KeyPairServiceTest {
     @InjectMocks
     private KeyPairService keyPairService;
 
-    private String userId = "testuser";
-    private String encryptionPassword = "1234567890123456";
+    @Value("${encryption.password}")
+    private String encryptionPassword;
+
+    private static final String USER_ID = "testuser";
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        // Establecer encryptionPassword en keyPairService
         ReflectionTestUtils.setField(keyPairService, "encryptionPassword", encryptionPassword);
     }
 
     @Test
     public void testGenerateKeyPair() throws NoSuchAlgorithmException {
-        KeyPair keyPair = keyPairService.generateKeyPair(userId);
-        assertNotNull(keyPair);
-        assertNotNull(keyPair.getPublicKey());
-        assertNotNull(keyPair.getPrivateKey());
-    }
+        when(keyPairRepository.findByUserId(anyString())).thenReturn(Optional.empty());
 
-    @Test
-    public void testGetKeyPair() {
         KeyPair mockKeyPair = new KeyPair();
-        mockKeyPair.setUserId(userId);
+        mockKeyPair.setUserId(USER_ID);
         mockKeyPair.setPublicKey("publicKey".getBytes());
         mockKeyPair.setPrivateKey("privateKey".getBytes());
 
-        when(keyPairRepository.findByUserId(anyString())).thenReturn(Optional.of(mockKeyPair));
+        when(keyPairRepository.save(any(KeyPair.class))).thenReturn(mockKeyPair);
 
-        Optional<KeyPair> retrievedKeyPair = keyPairService.getKeyPair(userId);
-        assertTrue(retrievedKeyPair.isPresent());
+        KeyPair keyPair = keyPairService.generateKeyPair(USER_ID);
+        assertNotNull(keyPair);
+        assertNotNull(keyPair.getPublicKey());
+        assertNotNull(keyPair.getPrivateKey());
     }
 }

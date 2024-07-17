@@ -14,34 +14,33 @@ public class EncryptionUtil {
 
     private static final String AES = "AES";
     private static final String AES_CIPHER_ALGORITHM = "AES/CBC/PKCS5PADDING";
+    private static final int IV_SIZE = 16;
+    private static final int KEY_SIZE = 32;
 
     private static SecretKey getKeyFromPassword(String password) throws Exception {
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
-        byte[] key = sha.digest(password.getBytes(StandardCharsets.UTF_8));
-        key = Arrays.copyOf(key, 32); // Use only first 256 bits (32 bytes)
+        byte[] key = Arrays.copyOf(sha.digest(password.getBytes(StandardCharsets.UTF_8)), KEY_SIZE);
         return new SecretKeySpec(key, AES);
     }
 
     public static String encrypt(String data, String password) throws Exception {
         Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
         SecretKey key = getKeyFromPassword(password);
-        byte[] iv = new byte[16];
+        byte[] iv = new byte[IV_SIZE];
         new SecureRandom().nextBytes(iv);
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
         cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
         byte[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        byte[] encryptedDataWithIv = new byte[iv.length + encryptedData.length];
-        System.arraycopy(iv, 0, encryptedDataWithIv, 0, iv.length);
-        System.arraycopy(encryptedData, 0, encryptedDataWithIv, iv.length, encryptedData.length);
+        byte[] encryptedDataWithIv = new byte[IV_SIZE + encryptedData.length];
+        System.arraycopy(iv, 0, encryptedDataWithIv, 0, IV_SIZE);
+        System.arraycopy(encryptedData, 0, encryptedDataWithIv, IV_SIZE, encryptedData.length);
         return Base64.getEncoder().encodeToString(encryptedDataWithIv);
     }
 
     public static String decrypt(String encryptedData, String password) throws Exception {
         byte[] encryptedDataWithIv = Base64.getDecoder().decode(encryptedData);
-        byte[] iv = new byte[16];
-        byte[] encryptedBytes = new byte[encryptedDataWithIv.length - iv.length];
-        System.arraycopy(encryptedDataWithIv, 0, iv, 0, iv.length);
-        System.arraycopy(encryptedDataWithIv, iv.length, encryptedBytes, 0, encryptedBytes.length);
+        byte[] iv = Arrays.copyOfRange(encryptedDataWithIv, 0, IV_SIZE);
+        byte[] encryptedBytes = Arrays.copyOfRange(encryptedDataWithIv, IV_SIZE, encryptedDataWithIv.length);
         Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
         SecretKey key = getKeyFromPassword(password);
         IvParameterSpec ivSpec = new IvParameterSpec(iv);

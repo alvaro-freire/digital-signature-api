@@ -27,6 +27,10 @@ public class KeyPairService {
     private String encryptionPassword;
 
     public KeyPair generateKeyPair(String userId) throws NoSuchAlgorithmException {
+        if (keyPairRepository.findByUserId(userId).isPresent()) {
+            throw new IllegalArgumentException("User already has a key pair");
+        }
+
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(2048);
         java.security.KeyPair keyPair = keyGen.genKeyPair();
