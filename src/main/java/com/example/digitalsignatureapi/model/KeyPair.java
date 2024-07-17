@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-public class KeyPairEntity {
+public class KeyPair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
