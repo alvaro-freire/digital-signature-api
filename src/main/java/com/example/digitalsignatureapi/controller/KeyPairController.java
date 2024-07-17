@@ -1,6 +1,6 @@
 package com.example.digitalsignatureapi.controller;
 
-import com.example.digitalsignatureapi.model.KeyPairEntity;
+import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.service.KeyPairService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ public class KeyPairController {
     private KeyPairService keyPairService;
 
     @PostMapping("/generate")
-    public ResponseEntity<KeyPairEntity> generateKeyPair(@RequestParam String userId) {
+    public ResponseEntity<KeyPair> generateKeyPair(@RequestParam String userId) {
         try {
-            KeyPairEntity keyPair = keyPairService.generateKeyPair(userId);
+            KeyPair keyPair = keyPairService.generateKeyPair(userId);
             return ResponseEntity.ok(keyPair);
         } catch (NoSuchAlgorithmException e) {
             return ResponseEntity.status(500).build();
@@ -26,7 +26,7 @@ public class KeyPairController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<KeyPairEntity> getKeyPair(@PathVariable String userId) {
+    public ResponseEntity<KeyPair> getKeyPair(@PathVariable String userId) {
         return keyPairService.getKeyPair(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
