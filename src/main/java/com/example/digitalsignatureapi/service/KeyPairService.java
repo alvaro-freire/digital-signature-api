@@ -1,5 +1,6 @@
 package com.example.digitalsignatureapi.service;
 
+import com.example.digitalsignatureapi.exception.UserAlreadyHasKeyPairException;
 import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.repository.KeyPairRepository;
 import com.example.digitalsignatureapi.util.EncryptionUtil;
@@ -27,8 +28,9 @@ public class KeyPairService {
     private String encryptionPassword;
 
     public KeyPair generateKeyPair(String userId) throws NoSuchAlgorithmException {
-        if (keyPairRepository.findByUserId(userId).isPresent()) {
-            throw new IllegalArgumentException("User already has a key pair");
+        Optional<KeyPair> existingKeyPair = keyPairRepository.findByUserId(userId);
+        if (existingKeyPair.isPresent()) {
+            throw new UserAlreadyHasKeyPairException(userId);
         }
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");

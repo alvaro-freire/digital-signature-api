@@ -3,6 +3,7 @@ package com.example.digitalsignatureapi.controller;
 import com.example.digitalsignatureapi.dto.DocumentRequest;
 import com.example.digitalsignatureapi.dto.SignResponse;
 import com.example.digitalsignatureapi.dto.VerifyRequest;
+import com.example.digitalsignatureapi.exception.UserAlreadyHasKeyPairException;
 import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.service.KeyPairService;
 import com.example.digitalsignatureapi.service.SignatureService;
@@ -28,13 +29,16 @@ public class KeyPairController {
     private SignatureService signatureService;
 
     @PostMapping("/generate")
-    public ResponseEntity<KeyPair> generateKeyPair(@RequestParam String userId) {
+    public ResponseEntity<Object> generateKeyPair(@RequestParam String userId) {
         try {
             KeyPair keyPair = keyPairService.generateKeyPair(userId);
             return ResponseEntity.ok(keyPair);
         } catch (NoSuchAlgorithmException e) {
             logger.error("Error generating key pair", e);
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).body("Error generating key pair");
+        } catch (UserAlreadyHasKeyPairException e) {
+            logger.error("User already has a key pair: {}", userId);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
