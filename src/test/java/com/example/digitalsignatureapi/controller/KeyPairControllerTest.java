@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,6 +40,9 @@ public class KeyPairControllerTest {
     @InjectMocks
     private KeyPairController keyPairController;
 
+    @Value("${API_PASSWORD}")
+    private String apiPassword;
+
     private static final String USER_ID = "testuser";
     private static final String DOCUMENT = "ZXN0byBlcyB1biBkb2N1bWVudG8K";
     private static final String SIGNATURE = "signature";
@@ -56,7 +60,8 @@ public class KeyPairControllerTest {
 
         when(keyPairService.generateKeyPair(anyString())).thenReturn(mockKeyPair);
 
-        mockMvc.perform(post("/api/keys/generate?userId=" + USER_ID))
+        mockMvc.perform(post("/api/keys/generate?userId=" + USER_ID)
+                        .header("Authorization", "Token " + apiPassword))
                 .andExpect(status().isOk());
     }
 
@@ -67,7 +72,8 @@ public class KeyPairControllerTest {
 
         when(keyPairService.getKeyPair(anyString())).thenReturn(Optional.of(mockKeyPair));
 
-        mockMvc.perform(get("/api/keys/" + USER_ID))
+        mockMvc.perform(get("/api/keys/" + USER_ID)
+                        .header("Authorization", "Token " + apiPassword))
                 .andExpect(status().isOk());
     }
 
@@ -80,7 +86,8 @@ public class KeyPairControllerTest {
 
         mockMvc.perform(post("/api/keys/sign?userId=" + USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"document\":\"" + DOCUMENT + "\"}"))
+                        .content("{\"document\":\"" + DOCUMENT + "\"}")
+                        .header("Authorization", "Token " + apiPassword))
                 .andExpect(status().isOk());
     }
 
@@ -94,7 +101,8 @@ public class KeyPairControllerTest {
 
         mockMvc.perform(post("/api/keys/verify?userId=" + USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"document\":\"" + DOCUMENT + "\", \"signature\":\"" + SIGNATURE + "\"}"))
+                        .content("{\"document\":\"" + DOCUMENT + "\", \"signature\":\"" + SIGNATURE + "\"}")
+                        .header("Authorization", "Token " + apiPassword))
                 .andExpect(status().isOk());
     }
 }
