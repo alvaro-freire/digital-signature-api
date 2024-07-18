@@ -17,7 +17,6 @@ import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Optional;
 
 @Service
 public class SignatureService {
@@ -31,49 +30,38 @@ public class SignatureService {
     private String encryptionPassword;
 
     public String signDocument(String userId, String document) throws Exception {
-        Optional<KeyPair> keyPairEntityOptional = keyPairRepository.findByUserId(userId);
-        if (keyPairEntityOptional.isPresent()) {
-            KeyPair keyPairEntity = keyPairEntityOptional.get();
-            String decryptedPrivateKey = EncryptionUtil.decrypt(new String(keyPairEntity.getPrivateKey(), StandardCharsets.UTF_8), encryptionPassword);
-            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(decryptedPrivateKey)));
+        KeyPair keyPairEntity = keyPairRepository.findByUserId(userId)
+                .orElseThrow(() -> new Exception("User not found"));
 
-            // decode doc in base64
-            byte[] decodedDocument = Base64.getDecoder().decode(document);
+        String decryptedPrivateKey = EncryptionUtil.decrypt(
+                new String(keyPairEntity.getPrivateKey(), StandardCharsets.UTF_8), encryptionPassword);
+        PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(
+                new PKCS8EncodedKeySpec(Base64.getDecoder().decode(decryptedPrivateKey)));
 
-            Signature signature = Signature.getInstance("SHA256withRSA");
-            signature.initSign(privateKey);
-            signature.update(decodedDocument);
+        byte[] decodedDocument = Base64.getDecoder().decode(document);
 
-            byte[] signedData = signature.sign();
-            String encodedSignature = Base64.getEncoder().encodeToString(signedData);
-            logger.info("Document signed for user: {} with signature: {}", userId, encodedSignature);
-            return encodedSignature;
-        } else {
-            logger.error("User not found: {}", userId);
-            throw new Exception("User not found");
-        }
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(decodedDocument);
+
+        byte[] signedData = signature.sign();
+        return Base64.getEncoder().encodeToString(signedData);
     }
 
     public boolean verifySignature(String userId, String document, String signature) throws Exception {
-        Optional<KeyPair> keyPairEntityOptional = keyPairRepository.findByUserId(userId);
-        if (keyPairEntityOptional.isPresent()) {
-            KeyPair keyPairEntity = keyPairEntityOptional.get();
-            PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyPairEntity.getPublicKey()));
+        KeyPair keyPairEntity = keyPairRepository.findByUserId(userId)
+                .orElseThrow(() -> new Exception("User not found"));
 
-            // decode doc in base64
-            byte[] decodedDocument = Base64.getDecoder().decode(document);
+        PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(
+                new X509EncodedKeySpec(keyPairEntity.getPublicKey()));
 
-            Signature sig = Signature.getInstance("SHA256withRSA");
-            sig.initVerify(publicKey);
-            sig.update(decodedDocument);
+        byte[] decodedDocument = Base64.getDecoder().decode(document);
 
-            byte[] decodedSignature = Base64.getDecoder().decode(signature);
-            boolean isValid = sig.verify(decodedSignature);
-            logger.info("Signature verified for user: {}, document: {}, signature: {}, isValid: {}", userId, document, signature, isValid);
-            return isValid;
-        } else {
-            logger.error("User not found: {}", userId);
-            throw new Exception("User not found");
-        }
+        Signature sig = Signature.getInstance("SHA256withRSA");
+        sig.initVerify(publicKey);
+        sig.update(decodedDocument);
+
+        byte[] decodedSignature = Base64.getDecoder().decode(signature);
+        return sig.verify(decodedSignature);
     }
 }

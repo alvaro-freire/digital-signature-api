@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class KeyPairServiceTest {
 
     @Mock
