@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -72,7 +73,8 @@ public class KeyPairControllerTest {
 
         mockMvc.perform(post("/api/keys/generate?userId=" + USER_ID)
                         .header("Authorization", "Bearer " + jwtToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(USER_ID));
     }
 
     @Test
@@ -85,7 +87,8 @@ public class KeyPairControllerTest {
 
         mockMvc.perform(get("/api/keys/" + USER_ID)
                         .header("Authorization", "Bearer " + jwtToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(USER_ID));
     }
 
     @Test
@@ -100,7 +103,8 @@ public class KeyPairControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"document\":\"" + DOCUMENT + "\"}")
                         .header("Authorization", "Bearer " + jwtToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.signature").value(SIGNATURE));
     }
 
     @Test
@@ -116,6 +120,7 @@ public class KeyPairControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"document\":\"" + DOCUMENT + "\", \"signature\":\"" + SIGNATURE + "\"}")
                         .header("Authorization", "Bearer " + jwtToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(true));
     }
 }

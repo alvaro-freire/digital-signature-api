@@ -20,8 +20,7 @@ import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -97,5 +96,33 @@ public class SignatureServiceTest {
 
         boolean isValid = signatureService.verifySignature(USER_ID, DOCUMENT, signature);
         assertTrue(isValid);
+    }
+
+    @Test
+    public void testVerifySignatureInvalid() throws Exception {
+        // generate keypair
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        java.security.KeyPair keyPair = keyGen.generateKeyPair();
+
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        KeyPair mockKeyPair = new KeyPair();
+        mockKeyPair.setUserId(USER_ID);
+        mockKeyPair.setPublicKey(publicKey.getEncoded());
+
+        // encrypt private key
+        String encryptedPrivateKey = EncryptionUtil.encrypt(Base64.getEncoder().encodeToString(privateKey.getEncoded()), encryptionPassword);
+        mockKeyPair.setPrivateKey(encryptedPrivateKey.getBytes());
+
+        when(keyPairRepository.findByUserId(anyString())).thenReturn(Optional.of(mockKeyPair));
+
+        // sign the doc
+        String signature = signatureService.signDocument(USER_ID, DOCUMENT);
+
+        // Use an invalid signature for this test
+        boolean isValid = signatureService.verifySignature(USER_ID, DOCUMENT, "uXhYbWYBrvyDb2agPTjsMl/F9oF+ZTr1dohmp9oIFYO0fXgccwTOyW0hk8rU2gowZB0+SUB5j7lvDzy+d9jrd4HavjOs5RimrRTB6ASJn6L/syYHcjZnmFkE4QH2c+vjnLotioThZHLyGTQvbQMmpmzQOLDos7qLN8VIUXMHwi2/+zhNBsPTYQ6Xc3L8YTcRRe/C4vLB9fj0cZySJ3eZ5to2MDLxPvBLv2f4OFtuerN9HKy85hqiKBo6fZvWrRgoVvuu2cVXlyAIpIZK93t6jNngeSVUst+oWEWmXZEeJ+9tRBmdJoTK6EFyrR0+eUQS5s0bQe18I5sZhJrRWGx6qw==");
+        assertFalse(isValid);
     }
 }
