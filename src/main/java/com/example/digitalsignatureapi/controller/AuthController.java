@@ -30,7 +30,7 @@ public class AuthController {
         }
 
         if (userId == null || userId.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("User ID is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID is required");
         }
 
         try {

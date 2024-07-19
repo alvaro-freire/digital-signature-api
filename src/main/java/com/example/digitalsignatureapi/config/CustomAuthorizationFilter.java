@@ -1,5 +1,8 @@
 package com.example.digitalsignatureapi.config;
 
+import com.example.digitalsignatureapi.exception.InvalidApiPasswordException;
+import com.example.digitalsignatureapi.exception.InvalidTokenException;
+import com.example.digitalsignatureapi.exception.MissingHeaderException;
 import com.example.digitalsignatureapi.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,16 +37,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String token = request.getHeader("Authorization");
 
-        if ("/api/authenticate".equals(path)) {
-            if (token == null || !token.equals("Bearer " + apiPassword)) {
-                logger.warn("Invalid API password");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API password");
-                return;
-            }
-            Authentication authentication = new PreAuthenticatedAuthenticationToken("authenticatedUser", null, null);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else if (token != null && token.startsWith("Bearer ")) {
-            try {
+        try {
+            if ("/api/authenticate".equals(path)) {
+                if (token == null || !token.equals("Bearer " + apiPassword)) {
+                    logger.warn("Invalid API password");
+                    throw new InvalidApiPasswordException();
+                }
+                Authentication authentication = new PreAuthenticatedAuthenticationToken("authenticatedUser", null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else if (token != null && token.startsWith("Bearer ")) {
                 String jwtToken = token.substring(7);
                 if (jwtService.validateToken(jwtToken)) {
                     String userId = jwtService.getUserIdFromToken(jwtToken);
@@ -52,16 +54,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     logger.warn("Invalid or expired token");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
-                    return;
+                    throw new InvalidTokenException();
                 }
-            } catch (Exception e) {
-                logger.error("Invalid token", e);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                return;
+            } else {
+                throw new MissingHeaderException("Authorization");
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required header: Authorization");
+        } catch (InvalidApiPasswordException | InvalidTokenException | MissingHeaderException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Error: " + e.getMessage());
             return;
         }
 

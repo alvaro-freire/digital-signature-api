@@ -46,7 +46,7 @@ public class JwtService {
             return true;
         } catch (SignatureException | ExpiredJwtException | MalformedJwtException e) {
             logger.error("Token validation error: {}", e.getMessage());
-            throw new InvalidTokenException("Invalid or expired token");
+            throw new InvalidTokenException();
         }
     }
 
