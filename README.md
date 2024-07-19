@@ -19,9 +19,7 @@ Una API REST simple que permite a los usuarios firmar digitalmente documentos y 
 2. Copia el archivo `.env.dist` a `.env`:
 
     ```bash
-    ENCRYPTION_PASSWORD=CHANGE_ME
-    API_PASSWORD=CHANGE_ME
-    JWT_SECRET=CHANGE_ME
+    cp .env.dist .env
     ```
 
 3. Configura las variables de entorno en el archivo `.env`:
@@ -46,6 +44,23 @@ Una API REST simple que permite a los usuarios firmar digitalmente documentos y 
 
 La aplicación estará disponible en `http://localhost:8080`.
 
+## Uso de Docker Compose
+
+Se utiliza Docker Compose para facilitar la configuración y el despliegue de la aplicación en un entorno de contenedor. Docker Compose permite definir y ejecutar aplicaciones multi-contenedor, lo que es ideal para entornos de desarrollo y producción, ya que asegura que el entorno sea consistente y fácil de configurar.
+
+## CI con GitHub Actions
+
+El archivo `ci.yml` se usa para configurar la integración continua (CI) con GitHub Actions. Este archivo define un flujo de trabajo que se ejecuta en cada push o pull request a la rama `main`. Las principales etapas del flujo de trabajo incluyen:
+
+1. **Checkout del repositorio**: Clona el repositorio en el runner de GitHub Actions.
+2. **Configuración de JDK 17**: Configura el entorno de Java 17 usando Temurin.
+3. **Cache de dependencias de Maven**: Usa la acción de cache para almacenar y restaurar dependencias de Maven.
+4. **Instalación de dependencias**: Ejecuta `mvn install` para instalar las dependencias del proyecto.
+5. **Ejecución de tests**: Ejecuta `mvn test` para correr los tests del proyecto.
+6. **Construcción del paquete**: Ejecuta `mvn package` para construir el paquete de la aplicación.
+
+Esto asegura que cada cambio en el código sea probado y verificado automáticamente antes de ser fusionado en la rama principal.
+
 ## Endpoints
 
 ### Autenticación
@@ -61,7 +76,7 @@ La aplicación estará disponible en `http://localhost:8080`.
 
 - **Query Params**:
     - `userId`: `your_user_id`
-  
+
 - **Respuesta**:
     ```json
     {
@@ -71,7 +86,7 @@ La aplicación estará disponible en `http://localhost:8080`.
 
 #### Ejemplo con `curl`:
 ```bash
-curl -X POST "http://localhost:8080/api/authenticate?userId=your_user_id" -H "Authorization: Bearer your_api_password" -H "Content-Type: application/json" -d '{"userId":"your_user_id"}'
+curl -X POST "http://localhost:8080/api/authenticate?userId=your_user_id" -H "Authorization: Bearer your_api_password" -H "Content-Type: application/json"
 ```
 
 ### Generar Par de Claves
@@ -193,6 +208,18 @@ curl -X POST "http://localhost:8080/api/keys/sign?userId=your_user_id" -H "Autho
 ```bash
 curl -X POST "http://localhost:8080/api/keys/verify?userId=your_user_id" -H "Authorization: Bearer your_jwt_token" -H "Content-Type: application/json" -d '{"document":"base64_encoded_document", "signature":"base64_encoded_signature"}'
 ```
+
+## Colección de Postman
+
+Para facilitar las pruebas, se incluye el archivo `Digital-Signature-API.postman_collection.json` que contiene una colección de ejemplos de solicitudes para cada endpoint. Puedes importar esta colección en Postman y utilizarla para probar la API.
+
+### Importar la colección en Postman
+
+1. Abre Postman.
+2. Haz clic en "Import" en la parte superior izquierda.
+3. Selecciona "Upload Files" y elige el archivo `Digital-Signature-API.postman_collection.json`.
+4. Haz clic en "Import" para agregar la colección a tu Postman.
+
 
 ## Licencia
 
