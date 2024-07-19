@@ -1,5 +1,6 @@
 package com.example.digitalsignatureapi.controller;
 
+import com.example.digitalsignatureapi.dto.AuthResponse;
 import com.example.digitalsignatureapi.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class AuthController {
     private String apiPassword;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticate(@RequestParam String userId, HttpServletRequest request) {
+    public ResponseEntity<Object> authenticate(@RequestParam String userId, HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.equals("Bearer " + apiPassword)) {
@@ -35,7 +36,7 @@ public class AuthController {
 
         try {
             String token = jwtService.generateToken(userId);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new AuthResponse(token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating token");
         }

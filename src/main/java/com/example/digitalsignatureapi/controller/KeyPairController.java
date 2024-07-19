@@ -3,6 +3,7 @@ package com.example.digitalsignatureapi.controller;
 import com.example.digitalsignatureapi.dto.DocumentRequest;
 import com.example.digitalsignatureapi.dto.SignResponse;
 import com.example.digitalsignatureapi.dto.VerifyRequest;
+import com.example.digitalsignatureapi.dto.VerifyResponse;
 import com.example.digitalsignatureapi.exception.UserAlreadyHasKeyPairException;
 import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.service.KeyPairService;
@@ -84,7 +85,7 @@ public class KeyPairController {
         try {
             logger.info("Verifying signature for user: {}", userId);
             boolean isValid = signatureService.verifySignature(userId, verifyRequest.getDocument(), verifyRequest.getSignature());
-            return ResponseEntity.ok(isValid);
+            return ResponseEntity.ok(new VerifyResponse(isValid));
         } catch (SignatureException e) {
             logger.error("Signature exception for user: {}", userId, e);
             return ResponseEntity.badRequest().body("Signature verification failed");
