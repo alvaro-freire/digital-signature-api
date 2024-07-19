@@ -16,5 +16,5 @@ services:
       - SPRING_H2_CONSOLE_PATH=/h2-console
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - ENCRYPTION_PASSWORD=${ENCRYPTION_PASSWORD}
-    volumes:
-      - ./data:/data
+      - API_PASSWORD=${API_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}

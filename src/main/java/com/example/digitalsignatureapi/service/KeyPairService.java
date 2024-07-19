@@ -28,8 +28,7 @@ public class KeyPairService {
     private String encryptionPassword;
 
     public KeyPair generateKeyPair(String userId) throws NoSuchAlgorithmException {
-        Optional<KeyPair> existingKeyPair = keyPairRepository.findByUserId(userId);
-        if (existingKeyPair.isPresent()) {
+        if (keyPairRepository.findByUserId(userId).isPresent()) {
             throw new UserAlreadyHasKeyPairException(userId);
         }
 
