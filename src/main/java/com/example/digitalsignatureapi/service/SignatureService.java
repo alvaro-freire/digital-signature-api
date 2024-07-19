@@ -3,8 +3,6 @@ package com.example.digitalsignatureapi.service;
 import com.example.digitalsignatureapi.model.KeyPair;
 import com.example.digitalsignatureapi.repository.KeyPairRepository;
 import com.example.digitalsignatureapi.util.EncryptionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,8 +18,6 @@ import java.util.Base64;
 
 @Service
 public class SignatureService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SignatureService.class);
 
     @Autowired
     private KeyPairRepository keyPairRepository;

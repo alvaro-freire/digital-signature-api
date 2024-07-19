@@ -18,5 +18,3 @@ services:
       - ENCRYPTION_PASSWORD=${ENCRYPTION_PASSWORD}
       - API_PASSWORD=${API_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - ./data:/data
