@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "ec305b7a-c999-4ddb-a190-ee77e6c9e95e",
+		"name": "Digital Signature API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20154386"
+	},
+	"item": [
+		{
+			"name": "Authenticate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eCNth9tpoaxmp7",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authenticate?userId=testuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authenticate"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "testuser"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate keys",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImV4cCI6MTcyMTM5NDMyNSwidXNlcklkIjoidGVzdHVzZXIiLCJpYXQiOjE3MjEzOTA3MjV9.FlJjwqYumzbmhrKUNScSfbBTjMMpJOmonAaDSDPOUUl0SIFSQsdw1-O1k5cYvLW-7MSVS0GVMUcws7nPy85R4Q",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/keys/generate?userId=testuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"keys",
+						"generate"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "testuser"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user keys",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImV4cCI6MTcyMTM5NjkxMCwidXNlcklkIjoidGVzdHVzZXIiLCJpYXQiOjE3MjEzOTMzMTB9.Ix2UvNP6n2tSW22Hy77k8qEkj8-rT8BAoE36ckc7ARdaOkTtdnXB8F3AGRPb8jQHC5TiVQP3aj7Qvs95CKZE5g",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/keys/testuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"keys",
+						"testuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign document",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImV4cCI6MTcyMTM5NjkxMCwidXNlcklkIjoidGVzdHVzZXIiLCJpYXQiOjE3MjEzOTMzMTB9.Ix2UvNP6n2tSW22Hy77k8qEkj8-rT8BAoE36ckc7ARdaOkTtdnXB8F3AGRPb8jQHC5TiVQP3aj7Qvs95CKZE5g",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"document\": \"ZXN0byBlcyB1biBkb2N1bWVudG8K\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/keys/sign?userId=testuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"keys",
+						"sign"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "testuser"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify signature",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImV4cCI6MTcyMTM5NjkxMCwidXNlcklkIjoidGVzdHVzZXIiLCJpYXQiOjE3MjEzOTMzMTB9.Ix2UvNP6n2tSW22Hy77k8qEkj8-rT8BAoE36ckc7ARdaOkTtdnXB8F3AGRPb8jQHC5TiVQP3aj7Qvs95CKZE5g",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"document\": \"ZXN0byBlcyB1biBkb2N1bWVudG8K\",\n    \"signature\": \"uXhYbWYBrvyDb2agPTjsMl/F9oF+ZTr1dohmp9oIFYO0fXgccwTOyW0hk8rU2gowZB0+SUB5j7lvDzy+d9jrd4HavjOs5RimrRTB6ASJn6L/syYHcjZnmFkE4QH2c+vjnLotioThZHLyGTQvbQMmpmzQOLDos7qLN8VIUXMHwi2/+zhNBsPTYQ6Xc3L8YTcRRe/C4vLB9fj0cZySJ3eZ5to2MDLxPvBLv2f4OFtuerN9HKy85hqiKBo6fZvWrRgoVvuu2cVXlyAIpIZK93t6jNngeSVUst+oWEWmXZEeJ+9tRBmdJoTK6EFyrR0+eUQS5s0bQe18I5sZhJrRWGx6qw==\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/keys/verify?userId=testuser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"keys",
+						"verify"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "testuser"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
